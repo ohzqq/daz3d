@@ -1,0 +1,16 @@
+Root:
+  Use: "daz"
+  Short: "bundle daz3d install package"
+  Long: quick utility for zipping daz3d packages
+  NoCommand: true
+Commands:
+- Use: "package"
+  Aliases:
+    - pkg
+  Short: package daz3d content
+  Long: package daz3d content
+  Flags:
+    - Name: dir
+      Value: '""'
+      Shorthand: d
+      Usage: "directory to package"
