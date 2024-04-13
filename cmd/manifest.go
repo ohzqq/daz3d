@@ -18,13 +18,10 @@ const (
 type Manifest struct {
 	XMLName  xml.Name `xml:"DAZInstallManifest"`
 	Version  string   `xml:"VERSION,attr"`
-	GlobalID *GlobalID
-	File     []*File
-}
-
-type GlobalID struct {
-	XMLName xml.Name `xml:"GlobalID"`
-	Value   string   `xml:"VALUE,attr"`
+	GlobalID struct {
+		Value string `xml:"VALUE,attr"`
+	}
+	File []*File
 }
 
 type File struct {
@@ -36,15 +33,13 @@ type File struct {
 
 func NewManifest(files []*File) *Manifest {
 	return &Manifest{
-		Version:  "0.1",
-		GlobalID: NewGlobalID(),
-		File:     files,
-	}
-}
-
-func NewGlobalID() *GlobalID {
-	return &GlobalID{
-		Value: strings.ToUpper(uuid.New().String()),
+		Version: "0.1",
+		GlobalID: struct {
+			Value string `xml:"VALUE,attr"`
+		}{
+			Value: strings.ToUpper(uuid.New().String()),
+		},
+		File: files,
 	}
 }
 
@@ -60,8 +55,10 @@ func GetFiles(root string) []*File {
 	var files []*File
 
 	fn := func(path string, d fs.DirEntry, err error) error {
-		f := filepath.Join(strings.TrimPrefix(path, root))
-		files = append(files, NewFile(f))
+		if !d.IsDir() {
+			f := filepath.Join(strings.TrimPrefix(path, root))
+			files = append(files, NewFile(f))
+		}
 		return nil
 	}
 

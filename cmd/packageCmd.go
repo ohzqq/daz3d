@@ -4,9 +4,11 @@ import (
 	"encoding/xml"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"path/filepath"
 
+	"github.com/gobuffalo/flect"
 	"github.com/spf13/cobra"
 )
 
@@ -29,20 +31,79 @@ func packageCmdRun(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	//os.Exit(0)
+	err = genMan(path)
+	if err != nil {
+		log.Fatalf("error generating manifest %s", err.Error())
+	}
+
+	err = genSup(path)
+	if err != nil {
+		log.Fatalf("error generating supplement %s", err.Error())
+	}
+
+	println(pkgName(path))
+}
+
+func genMan(path string) error {
 	files := GetFiles(path + "/")
-	//for _, f := range files {
-	//fmt.Printf("%#v\n", f)
-	//}
 	man := NewManifest(files)
 
 	d, err := xml.MarshalIndent(man, "", "  ")
 	if err != nil {
-		log.Fatalf("dir error %s", err.Error())
+		return err
 	}
 
-	err = os.WriteFile(filepath.Join(path, manifest), d, 0666)
+	f, err := os.Create(filepath.Join(path, manifest))
 	if err != nil {
-		log.Fatalf("dir error %s", err.Error())
+		return err
 	}
+	defer f.Close()
+
+	_, err = f.WriteString(xml.Header)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(d)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func genSup(path string) error {
+	sup := NewSupplement(path)
+	d, err := xml.MarshalIndent(sup, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(filepath.Join(path, supplement))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	_, err = f.WriteString(xml.Header)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(d)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func pkgName(dir string) string {
+	name := flect.Pascalize(filepath.Base(dir))
+	sku := genSKU()
+	return fmt.Sprintf("CH%08d-01_%s.zip", sku, name)
+}
+
+func genSKU() int {
+	return rand.Intn(100000000)
 }
