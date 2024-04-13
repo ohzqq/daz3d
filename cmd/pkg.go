@@ -2,15 +2,21 @@ package cmd
 
 import (
 	"archive/zip"
+	"encoding/xml"
 	"fmt"
 	"io/fs"
+	"math/rand"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"github.com/gobuffalo/flect"
 )
 
 type Pkg struct {
 	Name       string
 	path       string
+	dir        string
 	base       string
 	fs         fs.FS
 	manifest   *Manifest
@@ -18,14 +24,16 @@ type Pkg struct {
 }
 
 func NewPkg(path string) (*Pkg, error) {
+	path = strings.TrimSuffix(path, "/")
 	p := &Pkg{
-		Name:       pkgName(path),
-		path:       filepath.Dir(path),
+		path:       path,
+		dir:        filepath.Dir(path),
 		base:       filepath.Base(path),
 		fs:         os.DirFS(path),
 		manifest:   NewManifest(),
 		supplement: NewSupplement(path),
 	}
+	p.Name = filepath.Join(p.dir, pkgName(p.base))
 
 	err := p.GetFiles()
 	if err != nil {
@@ -33,6 +41,75 @@ func NewPkg(path string) (*Pkg, error) {
 	}
 
 	return p, nil
+}
+
+func (pkg *Pkg) Build() error {
+	err := pkg.WriteManifest()
+	if err != nil {
+		return err
+	}
+
+	err = pkg.WriteSupplement()
+	if err != nil {
+		return err
+	}
+
+	err = pkg.Zip()
+	if err != nil {
+		return fmt.Errorf("zip error: %w\n", err)
+	}
+
+	return nil
+}
+
+func (pkg *Pkg) WriteManifest() error {
+	d, err := xml.MarshalIndent(pkg.manifest, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(filepath.Join(pkg.path, manifest))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	_, err = f.WriteString(xml.Header)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(d)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (pkg *Pkg) WriteSupplement() error {
+	d, err := xml.MarshalIndent(pkg.supplement, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(filepath.Join(pkg.path, supplement))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	_, err = f.WriteString(xml.Header)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(d)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (pkg *Pkg) GetFiles() error {
@@ -53,7 +130,7 @@ func (pkg *Pkg) GetFiles() error {
 }
 
 func (pkg *Pkg) Zip() error {
-	z, err := os.Create(pkg.Name + ".zip")
+	z, err := os.Create(pkg.Name)
 	if err != nil {
 		return err
 	}
@@ -68,4 +145,14 @@ func (pkg *Pkg) Zip() error {
 	}
 
 	return nil
+}
+
+func pkgName(dir string) string {
+	name := flect.Pascalize(dir)
+	sku := genSKU()
+	return fmt.Sprintf("CH%08d-01_%s.zip", sku, name)
+}
+
+func genSKU() int {
+	return rand.Intn(100000000)
 }
