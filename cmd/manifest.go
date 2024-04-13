@@ -2,10 +2,6 @@ package cmd
 
 import (
 	"encoding/xml"
-	"io/fs"
-	"log"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/google/uuid"
@@ -61,44 +57,4 @@ func NewFile(path string) *File {
 		Action: "Install",
 		Value:  path,
 	}
-}
-
-func GetFiles(root string) []*File {
-	var files []*File
-
-	fn := func(path string, d fs.DirEntry, err error) error {
-		if !d.IsDir() {
-			f := filepath.Join(strings.TrimPrefix(path, root))
-			files = append(files, NewFile(f))
-		}
-		return nil
-	}
-
-	err := filepath.WalkDir(filepath.Join(root, "Content"), fn)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return files
-}
-
-func GetFilesFS(root string) ([]*File, error) {
-	var files []*File
-
-	fn := func(path string, d fs.DirEntry, err error) error {
-		if !d.IsDir() {
-			f := filepath.Join(path)
-			files = append(files, NewFile(f))
-		}
-		return nil
-	}
-
-	dir := os.DirFS(root)
-
-	err := fs.WalkDir(dir, "Content", fn)
-	if err != nil {
-		return nil, err
-	}
-
-	return files, nil
 }
