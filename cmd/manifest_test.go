@@ -34,6 +34,14 @@ func TestDirFS(t *testing.T) {
 	}
 }
 
-//func TestZip(t *testing.T) {
-//name := pkgName()
-//}
+func TestZip(t *testing.T) {
+	pkg, err := NewPkg(testPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = pkg.Zip()
+	if err != nil {
+		t.Fatal(err)
+	}
+}

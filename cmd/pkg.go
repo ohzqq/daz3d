@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"archive/zip"
 	"fmt"
 	"io/fs"
 	"os"
@@ -51,6 +52,20 @@ func (pkg *Pkg) GetFiles() error {
 	return nil
 }
 
-func SubFS(root string) fs.FS {
-	return os.DirFS(root)
+func (pkg *Pkg) Zip() error {
+	z, err := os.Create(pkg.Name + ".zip")
+	if err != nil {
+		return err
+	}
+	defer z.Close()
+
+	w := zip.NewWriter(z)
+	defer w.Close()
+
+	err = w.AddFS(pkg.fs)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
