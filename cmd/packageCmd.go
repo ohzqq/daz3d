@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gobuffalo/flect"
 	"github.com/spf13/cobra"
@@ -22,6 +23,8 @@ func packageCmdRun(cmd *cobra.Command, args []string) {
 		}
 	}
 	fmt.Fprintf(os.Stdout, "packaging %s\n", dir)
+
+	dir = strings.TrimSuffix(dir, "/")
 
 	path := filepath.Dir(dir)
 	base := filepath.Base(dir)
@@ -41,7 +44,12 @@ func packageCmdRun(cmd *cobra.Command, args []string) {
 		log.Fatalf("error generating supplement %s", err.Error())
 	}
 
-	println(pkgName(path))
+	pn := pkgName(path)
+
+	err = os.Mkdir(filepath.Join(path, pn), 0777)
+	if err != nil {
+		log.Fatalf("error generating supplement %s", err.Error())
+	}
 }
 
 func genMan(path string) error {
@@ -101,7 +109,7 @@ func genSup(path string) error {
 func pkgName(dir string) string {
 	name := flect.Pascalize(filepath.Base(dir))
 	sku := genSKU()
-	return fmt.Sprintf("CH%08d-01_%s.zip", sku, name)
+	return fmt.Sprintf("CH%08d-01_%s", sku, name)
 }
 
 func genSKU() int {
