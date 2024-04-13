@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"io/fs"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -68,4 +69,29 @@ func GetFiles(root string) []*File {
 	}
 
 	return files
+}
+
+func SubFS(root string) fs.FS {
+	return os.DirFS(root)
+}
+
+func GetFilesFS(root string) ([]*File, error) {
+	var files []*File
+
+	fn := func(path string, d fs.DirEntry, err error) error {
+		if !d.IsDir() {
+			f := filepath.Join(path)
+			files = append(files, NewFile(f))
+		}
+		return nil
+	}
+
+	dir := os.DirFS(root)
+
+	err := fs.WalkDir(dir, "Content", fn)
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }

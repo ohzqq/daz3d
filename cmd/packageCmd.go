@@ -13,6 +13,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type Pkg struct {
+	path string
+	base string
+}
+
 func packageCmdRun(cmd *cobra.Command, args []string) {
 	var dir string
 	var err error
