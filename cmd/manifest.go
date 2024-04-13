@@ -32,7 +32,18 @@ type File struct {
 	Value   string   `xml:"VALUE,attr"`
 }
 
-func NewManifest(files []*File) *Manifest {
+func NewManifest() *Manifest {
+	return &Manifest{
+		Version: "0.1",
+		GlobalID: struct {
+			Value string `xml:"VALUE,attr"`
+		}{
+			Value: strings.ToUpper(uuid.New().String()),
+		},
+	}
+}
+
+func NewMan(files []*File) *Manifest {
 	return &Manifest{
 		Version: "0.1",
 		GlobalID: struct {
@@ -69,10 +80,6 @@ func GetFiles(root string) []*File {
 	}
 
 	return files
-}
-
-func SubFS(root string) fs.FS {
-	return os.DirFS(root)
 }
 
 func GetFilesFS(root string) ([]*File, error) {

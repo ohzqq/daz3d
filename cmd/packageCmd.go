@@ -13,11 +13,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type Pkg struct {
-	path string
-	base string
-}
-
 func packageCmdRun(cmd *cobra.Command, args []string) {
 	var dir string
 	var err error
@@ -59,7 +54,7 @@ func packageCmdRun(cmd *cobra.Command, args []string) {
 
 func genMan(path string) error {
 	files := GetFiles(path + "/")
-	man := NewManifest(files)
+	man := NewMan(files)
 
 	d, err := xml.MarshalIndent(man, "", "  ")
 	if err != nil {
