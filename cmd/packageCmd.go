@@ -21,10 +21,13 @@ func packageCmdRun(cmd *cobra.Command, args []string) {
 
 	pkg, err := NewPkg(dir)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Errorf("new package error: %w\n", err)
+		os.Exit(1)
 	}
 	err = pkg.Build()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Errorf("package build error: %w\n", err)
+		os.Exit(1)
 	}
+	os.Exit(0)
 }
