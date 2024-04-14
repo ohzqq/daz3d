@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"encoding/xml"
-	"fmt"
 	"testing"
 )
 
@@ -48,18 +47,6 @@ func TestNewManifest(t *testing.T) {
 	}
 
 	println(string(d))
-}
-
-func TestDirFS(t *testing.T) {
-	t.SkipNow()
-	files, err := GetFilesFS(testPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, f := range files {
-		fmt.Printf("%#v\n", f)
-	}
 }
 
 func TestZip(t *testing.T) {

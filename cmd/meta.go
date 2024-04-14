@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/xml"
+	"path/filepath"
 	"strings"
 
 	"github.com/google/uuid"
@@ -28,6 +29,20 @@ type File struct {
 	Value   string   `xml:"VALUE,attr"`
 }
 
+type Supplement struct {
+	XMLName     xml.Name `xml:"ProductSupplement"`
+	Version     string   `xml:"VERSION,attr"`
+	ProductName struct {
+		Value string `xml:"VALUE,attr"`
+	}
+	InstallTypes struct {
+		Value string `xml:"VALUE,attr"`
+	}
+	ProductTags struct {
+		Value string `xml:"VALUE,attr"`
+	}
+}
+
 func NewManifest() *Manifest {
 	return &Manifest{
 		Version: "0.1",
@@ -39,22 +54,31 @@ func NewManifest() *Manifest {
 	}
 }
 
-func NewMan(files []*File) *Manifest {
-	return &Manifest{
-		Version: "0.1",
-		GlobalID: struct {
-			Value string `xml:"VALUE,attr"`
-		}{
-			Value: strings.ToUpper(uuid.New().String()),
-		},
-		File: files,
-	}
-}
-
 func NewFile(path string) *File {
 	return &File{
 		Target: "Content",
 		Action: "Install",
 		Value:  path,
+	}
+}
+
+func NewSupplement(name string) *Supplement {
+	return &Supplement{
+		Version: "0.1",
+		ProductName: struct {
+			Value string `xml:"VALUE,attr"`
+		}{
+			Value: filepath.Base(name),
+		},
+		InstallTypes: struct {
+			Value string `xml:"VALUE,attr"`
+		}{
+			Value: "Content",
+		},
+		ProductTags: struct {
+			Value string `xml:"VALUE,attr"`
+		}{
+			Value: "DAZStudio4_5",
+		},
 	}
 }
