@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -14,7 +13,8 @@ func packageCmdRun(cmd *cobra.Command, args []string) {
 	if cmd.Flags().Changed("dir") {
 		dir, err = cmd.Flags().GetString("dir")
 		if err != nil {
-			log.Fatalf("dir error %s", err.Error())
+			fmt.Errorf("dir error %s", err.Error())
+			os.Exit(1)
 		}
 	}
 	fmt.Fprintf(os.Stdout, "packaging %s\n", dir)
