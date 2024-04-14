@@ -16,5 +16,4 @@ var packageCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(packageCmd)
-	packageCmd.Flags().StringP("dir", "d", "", "directory to package")
 }
