@@ -3,6 +3,12 @@ Root:
   Short: "bundle daz3d install package"
   Long: quick utility for zipping daz3d packages
   NoCommand: true
+  Flags:
+    - Name: prefix
+      Shorthand: p
+      Value: '"CH"'
+      Persistent: true
+      Usage: "prefix for package: default CH"
 Commands:
 - Use: "package"
   Aliases:

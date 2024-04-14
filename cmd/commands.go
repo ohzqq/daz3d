@@ -15,5 +15,6 @@ var packageCmd = &cobra.Command{
 }
 
 func init() {
+	rootCmd.PersistentFlags().StringP("prefix", "p", "CH", "prefix for package: default CH")
 	rootCmd.AddCommand(packageCmd)
 }

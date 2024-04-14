@@ -158,7 +158,7 @@ func (pkg *Pkg) Zip() error {
 func pkgName(dir string) string {
 	name := flect.Pascalize(dir)
 	sku := genSKU()
-	return fmt.Sprintf("CH%08d-01_%s.zip", sku, name)
+	return fmt.Sprintf("%s%08d-01_%s.zip", pre, sku, name)
 }
 
 func genSKU() int {

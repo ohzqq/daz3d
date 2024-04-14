@@ -8,12 +8,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var pre = "ZZ"
+
 func packageCmdRun(cmd *cobra.Command, args []string) {
 	var dir string
 	var err error
-	if cmd.Flags().Changed("dir") {
-		dir, err = cmd.Flags().GetString("dir")
-	}
 
 	if len(args) > 0 {
 		dir = args[0]
@@ -29,6 +28,13 @@ func packageCmdRun(cmd *cobra.Command, args []string) {
 	}
 
 	fmt.Fprintf(os.Stdout, "packaging %s\n", dir)
+
+	if cmd.Flags().Changed("prefix") {
+		pre, err = cmd.Flags().GetString("prefix")
+		if err != nil {
+			pre = `"ZZ"`
+		}
+	}
 
 	pkg, err := NewPkg(dir)
 	if err != nil {
