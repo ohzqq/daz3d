@@ -25,17 +25,25 @@ type Pkg struct {
 
 func NewPkg(path string) (*Pkg, error) {
 	path = strings.TrimSuffix(path, "/")
+
+	dfs := os.DirFS(path)
+
+	_, err := fs.Stat(dfs, "Content")
+	if err != nil {
+		return nil, err
+	}
+
 	p := &Pkg{
 		path:       path,
 		dir:        filepath.Dir(path),
 		base:       filepath.Base(path),
-		fs:         os.DirFS(path),
+		fs:         dfs,
 		manifest:   NewManifest(),
 		supplement: NewSupplement(path),
 	}
 	p.Name = filepath.Join(p.dir, pkgName(p.base))
 
-	err := p.GetFiles()
+	err = p.GetFiles()
 	if err != nil {
 		return p, fmt.Errorf("error getting files %w\n", err)
 	}

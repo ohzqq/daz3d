@@ -9,6 +9,7 @@ Commands:
     - pkg
   Short: package daz3d content
   Long: package daz3d content
+  Args: cobra.ExactArgs(1)
   Flags:
     - Name: dir
       Value: '""'

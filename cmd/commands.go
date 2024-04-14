@@ -10,6 +10,7 @@ var packageCmd = &cobra.Command{
 	Aliases: []string{"pkg"},
 	Short:   "package daz3d content",
 	Long:    "package daz3d content",
+	Args:    cobra.ExactArgs(1),
 	Run:     packageCmdRun,
 }
 

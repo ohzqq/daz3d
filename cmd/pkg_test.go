@@ -7,6 +7,7 @@ import (
 
 const testPath = `../testdata/Muscularity Morphs for Genesis 9`
 const testSlash = `../testdata/Muscularity Morphs for Genesis 9/`
+const testBadPath = `../testdata`
 
 func TestBuildPackage(t *testing.T) {
 	pkg, err := NewPkg(testPath)
@@ -21,7 +22,7 @@ func TestBuildPackage(t *testing.T) {
 
 func TestPaths(t *testing.T) {
 	t.SkipNow()
-	for _, d := range []string{testPath, testSlash} {
+	for _, d := range []string{testPath, testSlash, testBadPath} {
 		pkg, err := NewPkg(d)
 		if err != nil {
 			t.Fatal(err)
